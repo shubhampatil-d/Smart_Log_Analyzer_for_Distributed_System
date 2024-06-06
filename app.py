@@ -264,6 +264,7 @@ def upload():
 # @app.route('/text_analysis')
 # def text_analysis():
 #     return render_template('result3.html')
+# fg gh
 
 if __name__ == '__main__':
     app.run(debug=True)
