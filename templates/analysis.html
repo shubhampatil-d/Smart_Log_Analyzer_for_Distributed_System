@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Button Click</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container my-4">
+        <p>Hello, welcome to Smart Log Analyzer.</p>
+        <p></p>
+
+        <!-- Responsive row with spaced buttons -->
+        <div class="row">
+            <div class="col-12 col-sm-4 mb-2">
+                <button id="statBtn" type="button" class="btn btn-outline-success w-100">Statistical Analysis</button>
+            </div>
+            <div class="col-12 col-sm-4 mb-2">
+                <button id="textBtn" type="button" class="btn btn-outline-danger w-100">Text Analysis</button>
+            </div>
+            <div class="col-12 col-sm-4 mb-2">
+                <button id="visualBtn" type="button" class="btn btn-outline-warning w-100">Visualisation</button>
+            </div>
+        </div>
+
+        <!-- Content area to be updated -->
+        <div id="content" class="my-4">
+            <p>Click a button to see something happen!</p>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle button clicks -->
+    <script>
+    // Get the content area
+    const contentArea = document.getElementById("content");
+
+    // Content to display for each button click
+    const statContent = `
+        <h3>Data Analysis Results</h3>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Stats of data</th>
+                    <td>{{ stats }}</td>
+                </tr>
+                <tr>
+                    <th>Describe data</th>
+                    <td>{{ textana|safe }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Text Length</th>
+                </tr>
+                <tr>
+                    <th>Count</th>
+                    <td>{{ textlen['count'] }}</td>
+                </tr>
+                <tr>
+                    <th>Mean</th>
+                    <td>{{ textlen['mean'] }}</td>
+                </tr>
+                <tr>
+                    <th>Standard Deviation</th>
+                    <td>{{ textlen['std'] }}</td>
+                </tr>
+                <tr>
+                    <th>Minimum</th>
+                    <td>{{ textlen['min'] }}</td>
+                </tr>
+                <tr>
+                    <th>25%</th>
+                    <td>{{ textlen['25%'] }}</td>
+                </tr>
+                <tr>
+                    <th>50%</th>
+                    <td>{{ textlen['50%'] }}</td>
+                </tr>
+                <tr>
+                    <th>75%</th>
+                    <td>{{ textlen['75%'] }}</td>
+                </tr>
+                <tr>
+                    <th>Maximum</th>
+                    <td>{{ textlen['max'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+
+    const textContent = `
+        <h3>Data Analysis Results</h3>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <th>Describe data</th>
+                    <td>{{ textana|safe }}</td>
+                </tr>
+                <tr>
+                    <th> INFO</th>
+                    <td> {{ loglevel['INFO'] }}</td>
+                </tr>
+                <tr>
+                    <th> WARN</th>
+                    <td> {{ loglevel['WARN'] }}</td>
+                </tr>
+                <tr>
+                    <th> ERROR</th>
+                    <td> {{ loglevel['ERROR'] }}</td>
+                </tr>
+
+            </tbody>
+        </table>
+        <h3> Thread Ids: </h3>{{ threadid }}
+        <h3>Info of data: </h3>{{ visual|safe }}
+        <h3> Anomaly:</h3>
+        <p>An anomaly is a deviation from the norm or an unexpected pattern in a dataset. In the context of log analysis, anomalies often indicate unusual behavior, potential errors, or security issues that require further investigation.
+        The data you provided identifies anomalies in a DataFrame based on the log level, using a common technique called z-score. Let's break it down step-by-step to understand how it detects anomalies:
+
+        <h4>Mapping Log Levels to Numeric Values</h4>
+        The code snippet first creates a mapping of log levels to numeric values:
+        'INFO' is mapped to 1,
+        'WARN' is mapped to 2,
+        'ERROR' is mapped to 3.
+        This step transforms qualitative data (log levels) into quantitative data, allowing further analysis.
+        <h4>Creating Z-Scores</h4>
+        After mapping, a new column log_level_zscore is created. It computes the z-score for each log level, which is a measure of how many standard deviations a value is from the mean.
+        A high z-score indicates that a data point is much higher or lower than the average, suggesting an outlier.
+        
+        </p><h5> {{ anomaly|safe }}</h5>
+        
+    `;
+
+    const visualContent = `
+        <h2>Visualisation of Log Data </h2>
+        <h3>Hourly Log Distribution</h3>
+        <img src="data:image/png;base64,{{ plot1 }}" alt="Hourly Log Distribution" class="img-fluid">
+        <p>This graph is a bar plot showing the distribution of log entries across different hours of the day. The x-axis represents the hour of the day (from 0 to 23), and the y-axis represents the number of log entries during each hour. This type of graph helps to identify trends or patterns in logging activity, revealing if certain times are more active or if there's an unusual spike at specific times.
+        <h6>Purpose:</h6> To understand the time-based distribution of log entries.
+        <h6>Usage:</h6> This information can be used to identify peak hours of activity, spot potential issues during specific times, or correlate with system or application behavior.
+        <!-- First Plot -->
+        </p>
+        <p>
+        <!-- Second Plot -->
+        <h3>Organization vs Log Levels</h3>
+        <img src="data:image/png;base64,{{ plot2 }}" alt="Organization vs Log Levels" class="img-fluid">
+        <p>This graph is a count plot showing the relationship between different organizations and the log levels they generate. The x-axis represents various organizations or services, and the y-axis indicates the count of log entries. The bars are color-coded by log levels, indicating the distribution of different log levels (such as "INFO," "WARN," "ERROR") across organizations.
+        <h6>Purpose: </h6>  To analyze how log levels are distributed across different organizations or components.
+        <h6>Usage: </h6>   This visualization helps to identify which organizations generate the most logs and what types of log levels are predominant. It can also indicate if some organizations tend to generate more warnings or errors, suggesting potential areas for further investigation or improvement.
+        </p>
+        <!--third plot -->
+        <h3> Log Levels Distribution</h3>
+        <img src="data:image/png;base64,{{ plot4 }}" alt="Log Levels Distribution" class="img-fluid">
+        <p>This plot displays the distribution of log levels within the dataset.
+        The x-axis represents the different log levels (e.g., INFO, WARN, ERROR), while the y-axis represents the count of log entries.
+        Each bar in the plot represents the frequency of a particular log level.
+        This plot helps visualize the distribution of log levels, showing which types of log messages are most common or prevalent in the dataset.
+        It provides insights into the severity and frequency of different types of log events, which can be valuable for understanding system behavior and identifying potential issues.
+        </p>
+        <h3> Log Count by Hour Plot</h3>
+        <img src="data:image/png;base64,{{ plot5 }}" alt="Log Count by Hour" class="img-fluid">
+        <p>This plot visualizes the number of log entries generated during each hour of the day.
+        The x-axis represents the hours of the day (0-23), while the y-axis represents the count of log entries.
+        Each bar in the plot represents the count of logs generated during a specific hour.
+        </p>
+        <p>This plot helps identify patterns or trends in log generation throughout the day, highlighting peak and off-peak hours of activity.
+        Annotated bars provide precise counts, making it easier to interpret the data.
+    </p>
+
+
+    `;
+
+    // Function to update content based on button clicks
+    function handleButtonClick(content) {
+        contentArea.innerHTML = content;
+    }
+
+    // Attach event listeners to buttons with appropriate content
+    document.getElementById("statBtn").addEventListener("click", () => {
+        handleButtonClick(statContent);
+    });
+
+    document.getElementById("textBtn").addEventListener("click", () => {
+        handleButtonClick(textContent);
+    });
+
+    document.getElementById("visualBtn").addEventListener("click", () => {
+        handleButtonClick(visualContent);
+    });
+    </script>
+</body>
+</html>
