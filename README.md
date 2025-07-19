@@ -65,4 +65,5 @@ The application will be accessible at `http://127.0.0.1:5000/` in your web brows
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
 
 ## License
+
 This project is licensed under the MIT License.
