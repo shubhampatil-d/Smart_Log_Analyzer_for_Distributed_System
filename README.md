@@ -16,6 +16,7 @@
 - **Backend:** Python, Flask
 - **Data Processing:** Pandas, SciPy
 - **Visualization:** Matplotlib, Seaborn
+- **Production Server:** Gunicorn
 - **Frontend:** HTML (Jinja2 templates)
 
 ## Getting Started
@@ -40,13 +41,20 @@ python -m venv venv
 
 ### 3. Install Dependencies
 
-Install all required Python packages using pip:
+Install the required Python packages using pip. Only the following packages are required for deployment and are listed in `requirements.txt`:
+- Flask
+- pandas
+- matplotlib
+- seaborn
+- scipy
+- gunicorn
 
+Run:
 ```powershell
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
-### 4. Run the Application
+### 4. Run the Application (Development)
 
 Start the Flask development server:
 
@@ -56,7 +64,15 @@ python app.py
 
 The application will be accessible at `http://127.0.0.1:5000/` in your web browser.
 
-### 5. Using the Application
+### 5. Deploying to Production (e.g., Render)
+- Ensure you have a `Procfile` with the following content:
+  ```
+  web: gunicorn app:app
+  ```
+- Push your code to GitHub and connect your repository to Render.
+- Render will use `requirements.txt` to install dependencies and the `Procfile` to start your app.
+
+### 6. Using the Application
 - Navigate to the home page.
 - Upload your log file using the provided form.
 - View statistical summaries, anomaly reports, and interactive visualizations generated from your log data.
